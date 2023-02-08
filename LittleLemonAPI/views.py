@@ -88,7 +88,7 @@ class UserViewSet(ModelViewSet):
 
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(['POST', 'PUT', 'DELETE'])
 def MenuItemsView(request):
     
     if(request.method=='GET'):
@@ -111,76 +111,53 @@ def MenuItemsView(request):
         else:
             return HttpResponse("{'error':1}", content_type='application/json')
 
-    # Title = request.GET.get('Title', "Cheeses!")
+    elif request.method == 'PUT':
+        data = dict(request.data);
+        Title = data['Title']
+        exist = Menu.objects.filter(Title=data['Title']).exists()
+        if exist==False:
+            Menues = Menu(
+                Title = data['Title'],
+                Price = data['Price'],
+                Inventory = data['Inventory'],
+            )
+            Menues.save()
+        else:
+            
+            menuId = Menu.objects.filter(Title=Title).values_list();
+            menuId.update(
+                Title = data['Title'],
+                Price = data['Price'],
+                Inventory = data['Inventory'],
+            )
 
-    # menues = Menu.objects.all().filter(Title=Title)
+    elif request.method == 'DELETE':
+        data = dict(request.data);
+        Title = data['Title']
+        exist = Menu.objects.filter(Title=data['Title']).exists()
+        if exist==False:
+            pass
+        else:
+            Menu.objects.filter(Title=Title).delete();
+            
     menues = Menu.objects.all();
     menues_json = serializers.serialize('json', menues)
 
     return HttpResponse(menues_json, content_type='application/json')
-    
-    
-# class MenuItemsView(generics.ListCreateAPIView):
-#     permission_classes = [IsAuthenticated]
-#     queryset = Menu.objects.all()
-#     serializer_class = MenuSerializer
-    
-#     def get_permissions(self):
-#         if(self.request.method=='GET'):
-#             return []
-
-#         return [IsAuthenticated()]
-    
-    # def list(self, request):
-    #     # Note the use of `get_queryset()` instead of `self.queryset`
-    #     queryset = self.get_queryset()
-    #     serializer = UserSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-
-
-    # def create(self, validated_data):
-    #     try:
-    #         user = User.objects.create(
-    #             username = validated_data['username'],
-    #         )      
-    #         user.set_password = validated_data['password']
-    #         user.save()
-    #         return user
-    #     except IntegrityError as e:
-    #         raise serializers.ValidationError({
-    #             "errors":str(e)
-    #         })
-    
-
-    # def create(self, request):
-        
-    #     print( request )
-    
-    #     if request.method == 'POST':
-    #         data = json.load(request)
-    #         exist = Menu.objects.filter(Title=data['Title']).exists()
-    #         if exist==False:
-    #             Menues = Menu(
-    #                 Title = data['Title'],
-    #                 Price = data['Price'],
-    #                 Inventory = data['Inventory'],
-    #             )
-    #             Menues.save()
-    #         else:
-    #             return HttpResponse("{'error':1}", content_type='application/json')
-
-    #     Title = request.GET.get('Title', "Cheeses!")
-
-    #     menues = Menu.objects.all().filter(Title=Title)
-    #     menues_json = serializers.serialize('json', menues)
-
-    #     return HttpResponse(menues, content_type='application/json')
 
 @csrf_exempt
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def bookings(request):
+    
+    if(request.method=='GET'):
+        return []
+
+    else:
+       IsAuthenticated()
+    
     if request.method == 'POST':
-        data = json.load(request)
-        exist = Booking.objects.filter(BookingDate=data['BookingDate']).exists()
+        data = dict(request.data);
+        exist = Booking.objects.filter(BookingDate=data['BookingDate'], Name=data['Name']).exists()
         if exist==False:
             booking = Booking(
                 Name = data['Name'],
@@ -190,10 +167,41 @@ def bookings(request):
             booking.save()
         else:
             return HttpResponse("{'error':1}", content_type='application/json')
+        
+        
+    ###
+    elif request.method == 'PUT':
+        data = dict(request.data);
+        exist = Booking.objects.filter(BookingDate=data['BookingDate'], Name=data['Name']).exists()
+        if exist==False:
+            Bookings = Booking(
+                Name = data['Name'],
+                No_of_guests = data['No_of_guests'],
+                BookingDate = data['BookingDate'],
+            )
+            Bookings.save()
+        else:
+            
+            BookingId = Booking.objects.filter(BookingDate=data['BookingDate'], Name=data['Name']).values_list();
+            BookingId.update(
+                Name = data['Name'],
+                No_of_guests = data['No_of_guests'],
+                BookingDate = data['BookingDate'],
+            )
+
+    elif request.method == 'DELETE':
+        data = dict(request.data);
+        exist = Booking.objects.filter(BookingDate=data['BookingDate'], Name=data['Name']).exists()
+        if exist==False:
+            pass
+        else:
+            Booking.objects.filter(BookingDate=data['BookingDate'], Name=data['Name']).delete();
+    ###
     
     date = request.GET.get('date', datetime.today().date())
 
-    bookings = Booking.objects.all().filter(BookingDate=date)
+    # bookings = Booking.objects.all().filter(BookingDate=date)
+    bookings = Booking.objects.all();
     booking_json = serializers.serialize('json', bookings)
 
     return HttpResponse(booking_json, content_type='application/json')
