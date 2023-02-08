@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     ### ADD ###
     'LittleLemonAPI',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,37 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    # ENTER YOUR CODE HERE
+    
+    ### ADD
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAdminUser',
+    ),
+    ###
+    'DEFAULT_FILTER_CLASSES' : ['rest_framework.filters.OrderingFilter', 'rest_framework.filters.SearchFilter'],
+    'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE' : 3, 
+    
+    # Authentication
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.authentication.TokenAuthentication',
+    #     'rest_framework.authentication.SessionAuthentication',
+    # ),
+    
+    ### ADD
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    
+    ###
+    
+    # Throttle
+    'DEFAULT_THROTTLE_CLASSES': [ 'rest_framework.throttling.AnonRateThrottle', 'rest_framework.throttling.UserRateThrottle' ],
+    'DEFAULT_THROTTLE_RATES': { 'anon': '100/minute', 'user': '200/minute' },
+}

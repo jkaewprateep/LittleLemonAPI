@@ -1,12 +1,11 @@
 from django.shortcuts import render
 
 ### ADD ###
-from .models import Booking, Menu, MenuItem
+from .models import Booking, Menu;
 from .serializers import (
     BookingSerializer,
     MenuSerializer,
-    UserSerializer,
-    MenuItemSerializer,
+    UserSerializer
 )
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -34,14 +33,17 @@ from django.views.decorators.csrf import csrf_exempt;
 from django.core import serializers;
 
 
+# from rest_framework.response import Response
+
+
 # Create your views here.
 # @api_view()
 class BookingView(ListAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    ordering_fields = ["Title", "Price", "Inventory"]
-    filterset_fields = ["Title", "Price", "Inventory"]
-    search_fields = ["Title", "Price", "Inventory"]
+    ordering_fields = [ "Title", "Price", "Inventory" ];
+    filterset_fields = [ "Title", "Price", "Inventory" ];
+    search_fields = [ "Title", "Price", "Inventory" ];
 
     permission_classes = [IsAuthenticated]
 
@@ -50,27 +52,27 @@ class BookingView(ListAPIView):
 class MenuView(ListAPIView):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
-    ordering_fields = ["Name", "No_of_guests", "BookingDate"]
-    filterset_fields = ["Name", "No_of_guests", "BookingDate"]
-    search_fields = ["Name", "No_of_guests", "BookingDate"]
-
-
+    ordering_fields = [ "Title", "Price", "Inventory" ];
+    filterset_fields = [ "Title", "Price", "Inventory" ];
+    search_fields = [ "Title", "Price", "Inventory" ];
+    
 # @api_view()
-class MenuItemView(ListCreateAPIView):
-    queryset = Menu.objects.all()
-    serializer_class = MenuSerializer
-    ordering_fields = ["Name", "No_of_guests", "BookingDate"]
-    filterset_fields = ["Name", "No_of_guests", "BookingDate"]
-    search_fields = ["Name", "No_of_guests", "BookingDate"]
+# class MenuItemView(ListCreateAPIView):
+# class MenuItemView(ListCreateAPIView):
+#     queryset = Menu.objects.all()
+#     serializer_class = MenuSerializer
+#     ordering_fields =[ "Title", "Price", "Inventory" ];
+#     filterset_fields = [ "Title", "Price", "Inventory" ];
+#     search_fields = [ "Title", "Price", "Inventory" ];
 
 
 # @api_view()
 class SingleMenuItemView(RetrieveUpdateAPIView, DestroyAPIView):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
-    ordering_fields = ["Name", "No_of_guests", "BookingDate"]
-    filterset_fields = ["Name", "No_of_guests", "BookingDate"]
-    search_fields = ["Name", "No_of_guests", "BookingDate"]
+    ordering_fields = [ "Title", "Price", "Inventory" ];
+    filterset_fields = [ "Title", "Price", "Inventory" ];
+    search_fields = [ "Title", "Price", "Inventory" ];
 
 
 class BookingViewSet(ModelViewSet):
@@ -85,11 +87,94 @@ class UserViewSet(ModelViewSet):
     permission_classes = IsAuthenticated
 
 
-class MenuItemsView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Menu.objects.all()
-    serializer_class = MenuSerializer
+@csrf_exempt
+@api_view(['POST'])
+def MenuItemsView(request):
+    
+    if(request.method=='GET'):
+        return []
 
+    else:
+       IsAuthenticated()
+       
+    if request.method == 'POST':
+        # data = json.load(request)
+        data = dict(request.data);
+        exist = Menu.objects.filter(Title=data['Title']).exists()
+        if exist==False:
+            Menues = Menu(
+                Title = data['Title'],
+                Price = data['Price'],
+                Inventory = data['Inventory'],
+            )
+            Menues.save()
+        else:
+            return HttpResponse("{'error':1}", content_type='application/json')
+
+    # Title = request.GET.get('Title', "Cheeses!")
+
+    # menues = Menu.objects.all().filter(Title=Title)
+    menues = Menu.objects.all();
+    menues_json = serializers.serialize('json', menues)
+
+    return HttpResponse(menues_json, content_type='application/json')
+    
+    
+# class MenuItemsView(generics.ListCreateAPIView):
+#     permission_classes = [IsAuthenticated]
+#     queryset = Menu.objects.all()
+#     serializer_class = MenuSerializer
+    
+#     def get_permissions(self):
+#         if(self.request.method=='GET'):
+#             return []
+
+#         return [IsAuthenticated()]
+    
+    # def list(self, request):
+    #     # Note the use of `get_queryset()` instead of `self.queryset`
+    #     queryset = self.get_queryset()
+    #     serializer = UserSerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
+
+    # def create(self, validated_data):
+    #     try:
+    #         user = User.objects.create(
+    #             username = validated_data['username'],
+    #         )      
+    #         user.set_password = validated_data['password']
+    #         user.save()
+    #         return user
+    #     except IntegrityError as e:
+    #         raise serializers.ValidationError({
+    #             "errors":str(e)
+    #         })
+    
+
+    # def create(self, request):
+        
+    #     print( request )
+    
+    #     if request.method == 'POST':
+    #         data = json.load(request)
+    #         exist = Menu.objects.filter(Title=data['Title']).exists()
+    #         if exist==False:
+    #             Menues = Menu(
+    #                 Title = data['Title'],
+    #                 Price = data['Price'],
+    #                 Inventory = data['Inventory'],
+    #             )
+    #             Menues.save()
+    #         else:
+    #             return HttpResponse("{'error':1}", content_type='application/json')
+
+    #     Title = request.GET.get('Title', "Cheeses!")
+
+    #     menues = Menu.objects.all().filter(Title=Title)
+    #     menues_json = serializers.serialize('json', menues)
+
+    #     return HttpResponse(menues, content_type='application/json')
 
 @csrf_exempt
 def bookings(request):

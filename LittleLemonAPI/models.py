@@ -20,13 +20,13 @@ class Menu(models.Model):
     Inventory = models.IntegerField(max_length=5)
 
     def __str__(self):
-        return f"{self.title} : {str(self.price)}"
+        return f"{self.Title} : {str(self.Price)}"
 
 
-class MenuItem(models.Model):
-    title = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.SmallIntegerField()
+# class MenuItem(models.Model):
+#     title = models.CharField(max_length=255)
+#     price = models.DecimalField(max_digits=6, decimal_places=2)
+#     inventory = models.SmallIntegerField()
 
-    def get_item(self):
-        return f"{self.title} : {str(self.price)}"
+#     def get_item(self):
+#         return f"{self.title} : {str(self.price)}"

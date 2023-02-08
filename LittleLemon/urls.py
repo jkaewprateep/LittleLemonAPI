@@ -23,7 +23,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
 
-from LittleLemonAPI.views import MenuItemView as MenuItemviewAPI, SingleMenuItemView;
+from LittleLemonAPI.views import SingleMenuItemView, MenuItemsView;
 
 ### ADD ###
 from LittleLemonAPI.views import bookings, index;
@@ -38,6 +38,11 @@ router = DefaultRouter()
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    
+    # path("menu/", MenuItemsView.as_view()),
+    path('menu/', MenuItemsView, name='menu-list'),
+    path("menu/<int:pk>", SingleMenuItemView.as_view()),
+    
     # add following line to urlpatterns list
     # path('restaurant/menu/', include('restaurant.urls')),
     path("LittleLemonAPI/", include("LittleLemonAPI.urls")),
@@ -53,7 +58,7 @@ urlpatterns = [
     # path('menu-items/', '.'),
     path("api-token-auth/", obtain_auth_token),
     
-    path("api/menu-items/", MenuItemviewAPI.as_view()),
+    path("api/menu-items/", MenuItemsView),
     path("api/menu-items/<int:pk>", SingleMenuItemView.as_view()),
     
     
